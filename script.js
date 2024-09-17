@@ -1,197 +1,189 @@
-
-
 let menuIcon = document.querySelector('#menu-icon');
 let navbar = document.querySelector('.navbar');
 let sections = document.querySelectorAll('section');
 let navLinks = document.querySelectorAll('header nav a');
- 
+
 window.onscroll = () => {
-    sections.forEach(sec=>{
+    sections.forEach(sec => {
         let top = window.scrollY;
         let offset = sec.offsetTop - 150;
         let height = sec.offsetHeight;
         let id = sec.getAttribute('id');
 
-        if(top >= offset && top < offset + height){
-            navLinks.forEach(links =>{
+        if (top >= offset && top < offset + height) {
+            navLinks.forEach(links => {
                 links.classList.remove('active');
-                document.querySelector('header nav a [href*=' +id+ ']').classList.add('active')
-            })
+                document.querySelector('header nav a[href*=' + id + ']').classList.add('active');
+            });
         }
-    })
-}
+    });
+};
 
-menuIcon.onclick = ()=>{
+menuIcon.onclick = () => {
     menuIcon.classList.toggle('bx-x');
     navbar.classList.toggle('active');
-}
+};
 
-// Phys Simulation
-
-
+// Physics Simulation and Improved Honeybee Pattern
 document.addEventListener('DOMContentLoaded', function () {
     const icons = document.querySelectorAll('.logo');
     const circle = document.querySelector('.circle');
-    const hov = document.querySelector('.hov');
-    const circleRect = circle.getBoundingClientRect();
-    const hovRect = hov.getBoundingClientRect();
-    const radius = circleRect.width / 2;
-    const centerX = circleRect.width / 2;
-    const centerY = circleRect.height / 2;
 
-    // Initialize positions for each icon
+    // Recalculate circle dimensions on resize for responsiveness
+    const updateCircleDimensions = () => {
+        const circleRect = circle.getBoundingClientRect();
+        const radius = circleRect.width / 2;
+        const centerX = circleRect.width / 2;
+        const centerY = circleRect.height / 2;
+        return { circleRect, radius, centerX, centerY };
+    };
+
+    let { circleRect, radius, centerX, centerY } = updateCircleDimensions();
+
+    window.addEventListener('resize', debounce(() => {
+        ({ circleRect, radius, centerX, centerY } = updateCircleDimensions());
+        arrangeIconsInHoneycomb();
+    }, 200));
+
+    // Initialize positions for each icon with staggered animation coming from outside the circle
     icons.forEach((icon, index) => {
         const angle = Math.random() * 2 * Math.PI;
-        const distance = Math.random() * radius;
+        const distance = radius * 1.5; // Start far outside the circle
         const initialX = centerX + distance * Math.cos(angle) - icon.offsetWidth / 2;
         const initialY = centerY + distance * Math.sin(angle) - icon.offsetHeight / 2;
 
-        // Set initial position
         icon.style.left = `${initialX}px`;
         icon.style.top = `${initialY}px`;
-        icon.style.opacity = 1; // Fully visible inside the circle
-        icon.style.transform = 'scale(1)'; // Start with larger size
+        icon.style.opacity = 0;
 
-        // Simulate falling effect
+        // Simulate icons converging into the center
         setTimeout(() => {
             icon.style.transition = 'all 1s ease-out';
             icon.style.opacity = 1;
-            icon.style.transform = 'scale(1)';
 
-            // Ensure icons settle at the bottom of the circle
             const settledX = centerX - icon.offsetWidth / 2;
-            const settledY = circleRect.height/2  - icon.offsetHeight;
+            const settledY = centerY - icon.offsetHeight / 2;
+
             icon.style.left = `${settledX}px`;
             icon.style.top = `${settledY}px`;
 
-            // Add slight random movement after settling
+            // After reaching the center, spread into the honeycomb pattern
             setTimeout(() => {
-                icon.style.transition = 'top 0.8s ease-in-out, left 0.8s ease-in-out';
-                icon.style.left = `${Math.random()*(circleRect.width - icon.clientWidth)}px`;
-                // icon.style.top = `${Math.random()*(circleRect.height - icon.clientWidth)}px`;
-    
-            }, 2000);
-        }, index * 100); // Staggered start
-
-
-        
-    icons.forEach((icon) => {
-      const startDrag = (event) => {
-        event.preventDefault();
-
-        const isTouch = event.type === 'touchstart';
-        const startX = isTouch ? event.touches[0].clientX : event.clientX;
-        const startY = isTouch ? event.touches[0].clientY : event.clientY;
-        const offsetX = startX - icon.getBoundingClientRect().left;
-        const offsetY = startY - icon.getBoundingClientRect().top;
-
-        const onDrag = (moveEvent) => {
-            const clientX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
-            const clientY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
-
-            let x = clientX - circleRect.left - offsetX;
-            let y = clientY - circleRect.top - offsetY;
-
-            // Constrain the icon within the circle
-            const distanceFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-            if (distanceFromCenter + icon.clientWidth / 2 > radius) {
-                const angle = Math.atan2(y - centerY, x - centerX);
-                x = centerX + (radius - icon.clientWidth / 2) * Math.cos(angle) - icon.clientWidth / 2;
-                y = centerY + (radius - icon.clientHeight / 2) * Math.sin(angle) - icon.clientHeight / 2;
-            }
-
-            icon.style.left = `${x}px`;
-            icon.style.top = `${y}px`;
-        };
-
-        const endDrag = () => {
-            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
-            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
-        };
-
-        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
-        document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
-    };
-
-    icon.addEventListener('mousedown', startDrag);
-    icon.addEventListener('touchstart', startDrag, { passive: false });
-});
-
-
-
+                arrangeIconsInHoneycomb();
+            }, 1000 + index * 100); // Staggered spreading animation
+        }, index * 200); // Staggered start for convergence
     });
 
-    // Function to arrange icons in a circular pattern around the circle
+    // Arrange icons in a honeycomb pattern
+    function arrangeIconsInHoneycomb() {
+        let offsetIndex = 0;
+        const iconSize = icons[0].offsetWidth; // Assuming square icons
+        const spacing = iconSize * 1.2; // Add a little spacing between icons
+        const hexHeight = spacing * Math.sqrt(3) / 2; // Vertical spacing for hexagonal layout
+
+        // Generate honeycomb pattern by iterating in layers from the center outwards
+        let layer = 0;
+        let iconsToPlace = icons.length;
+        const maxIconsPerLayer = (layer) => 6 * layer || 1; // 1 icon at the center, then 6 per layer
+
+        while (iconsToPlace > 0) {
+            const iconsInThisLayer = Math.min(maxIconsPerLayer(layer), iconsToPlace);
+            for (let i = 0; i < iconsInThisLayer; i++) {
+                const angle = (i / iconsInThisLayer) * (2 * Math.PI); // Divide the circle for icons
+                const layerRadius = layer * spacing; // Increase distance with each layer
+
+                const hexX = centerX + layerRadius * Math.cos(angle) - iconSize / 2;
+                const hexY = centerY + layerRadius * Math.sin(angle) - iconSize / 2;
+
+                if (offsetIndex < icons.length) {
+                    const icon = icons[offsetIndex];
+                    icon.style.transition = 'top 0.8s ease-in-out, left 0.8s ease-in-out';
+                    icon.style.left = `${hexX}px`;
+                    icon.style.top = `${hexY}px`;
+                    offsetIndex++;
+                }
+            }
+
+            iconsToPlace -= iconsInThisLayer;
+            layer++; // Move to the next outer layer
+        }
+    }
+
+    // Event listener to arrange icons in a ring outside the circle
+    circle.addEventListener('click', () => {
+        arrangeIconsInRing();
+        circle.classList.add('rotate-icons'); // Start rotating icons on click
+    });
+
+    // Arrange icons in a circular ring outside the circle
     function arrangeIconsInRing() {
-        const angleStep = (2 * Math.PI) / icons.length; // Calculate the angle between each icon
-
+        const angleStep = (2 * Math.PI) / icons.length;
         icons.forEach((icon, index) => {
-            const angle = index * angleStep; // Calculate the angle for the current icon
-            const iconX = centerX + (radius + 30) * Math.cos(angle) - icon.offsetWidth / 2; // X position
-            const iconY = centerY + (radius + 30) * Math.sin(angle) - icon.offsetHeight /2; // Y position
+            const angle = index * angleStep;
+            const iconX = centerX + (radius * 1.2) * Math.cos(angle) - icon.offsetWidth / 2; // 1.4 * radius for outside circle
+            const iconY = centerY + (radius * 1.2) * Math.sin(angle) - icon.offsetHeight / 2;
 
-            // Apply the calculated positions to the icon
             icon.style.position = 'absolute';
             icon.style.left = `${iconX}px`;
             icon.style.top = `${iconY}px`;
-            icon.style.transition = 'all 0.8s ease'; // Smooth transition
-            const rotateDegree = angle * (180 / Math.PI) + 90; // Convert to degrees and adjust for upright position
+
+            // Rotate icon to face outward
+            const rotateDegree = angle * (180 / Math.PI) + 90;
             icon.style.transform = `rotate(${rotateDegree}deg) scale(1.1)`;
-        });
-        
-        // Apply rotation and visibility effects
-        icons.forEach(icon => {
-            icon.style.opacity = 0; // Hide all initially
         });
 
         setTimeout(() => {
-            icons.forEach(icon => {
-                icon.style.opacity = 1; // Fade in icons
-            });
-
-
-        }, 400); // Delay for smooth appearance
-    }
-    
-
-    // Update icon visibility during rotation
-    function updateIconVisibility() {
-        const centerY = window.innerHeight / 2; // Assuming the center of the circle is at the middle of the viewport
-        icons.forEach(icon => {
-            const iconRect = icon.getBoundingClientRect();
-            const iconCenterY = iconRect.top + iconRect.height;
-
-
-
-            if (iconCenterY <= centerY) {
-                // The icon is in the upper half of the circle
-                icon.style.opacity = 1; // Fully visible
-            } else {
-                // The icon is in the lower half of the circle
-                icon.style.opacity = 0; // Partially hidden
-                
-            }
-        });
+            icons.forEach(icon => icon.style.opacity = 1);
+        }, 400);
     }
 
-    // Call the update function continuously or on each rotation step
-    setInterval(updateIconVisibility, 16); // Approximately 60fps
+    // Drag functionality for icons
+    icons.forEach((icon) => {
+        const startDrag = (event) => {
+            event.preventDefault();
+            const isTouch = event.type === 'touchstart';
+            const startX = isTouch ? event.touches[0].clientX : event.clientX;
+            const startY = isTouch ? event.touches[0].clientY : event.clientY;
+            const offsetX = startX - icon.getBoundingClientRect().left;
+            const offsetY = startY - icon.getBoundingClientRect().top;
 
-    // Attach an event listener to update visibility during animation
-    circle.addEventListener('animationiteration', updateIconVisibility);
+            const onDrag = (moveEvent) => {
+                const clientX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                const clientY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
 
-    // Event listener for clicking on the circle to arrange icons in a ring
-    circle.addEventListener('click', () => {
-        arrangeIconsInRing();
-        // Add rotation animation
-        circle.classList.add('rotate-icons');
-        setInterval(scaleIconOverHov, 16); // Approximately 60fps
+                let x = clientX - circleRect.left - offsetX;
+                let y = clientY - circleRect.top - offsetY;
+
+                const distanceFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+                if (distanceFromCenter + icon.clientWidth / 2 > radius) {
+                    const angle = Math.atan2(y - centerY, x - centerX);
+                    x = centerX + (radius - icon.clientWidth / 2) * Math.cos(angle) - icon.clientWidth / 2;
+                    y = centerY + (radius - icon.clientHeight / 2) * Math.sin(angle) - icon.clientHeight / 2;
+                }
+
+                icon.style.left = `${x}px`;
+                icon.style.top = `${y}px`;
+            };
+
+            const endDrag = () => {
+                document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
+                document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
+            };
+
+            document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
+            document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
+        };
+
+        icon.addEventListener('mousedown', startDrag);
+        icon.addEventListener('touchstart', startDrag, { passive: false });
     });
-      
 
+    // Debounce function to prevent excessive firing on resize
+    function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
 });
-
-
-
-
-
