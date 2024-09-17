@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Me | Harsh's Portfolio</title>
+    <link rel="icon" type="image/png" href="./containts/favicon.webp">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Basic styles for the form */
+        :root{
+            /* --bg-color: #080808;
+            --second-bg-color: #131313;
+            --text-color: white;
+            --main-color: #00ffee; */
+            --bg-color: black;
+            --second-bg-color: rgba(0, 0, 0);
+            --text-color:rgb(255, 255, 255);
+            --personal-color: rgb(0, 255, 0);
+            --secmain-color: black;
+            --main-color: rgb(0, 227, 0);
+            --textnew-color:rgb(8, 209, 11);
+            /* --main-color: rgb(50, 252, 0); */
+            /* --main-color: rgb(0, 134, 252); */
+         }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color:var(--bg-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+        }
+        .heading {
+            border-radius: 1rem;
+            background-color: var(--personal-color);
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px black;
+        }
+        span {
+            color: var(--textnew-color);
+        }
+        form {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            margin: 0 auto;
+        }
+        
+        input{
+            width: 100%;
+            height: 2rem;
+            padding: 10px;
+            margin: 1rem 0;
+            background-color: black;
+            color: white;
+            border: 1px solid var(--textnew-color);
+            border-radius: 5px;
+        }
+        textarea{
+            width: 100%;
+            padding: 10px;
+            margin: 1rem 0;
+            background-color: black;
+            color: white;
+            border: 1px solid var(--textnew-color);
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            width: 50%;
+            height: auto;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: darkgreen;
+        }
+        /* Error message styling */
+        .error {
+            color: red;
+            font-size: 0.9rem;
+        }
+        @media (max-width:700px) {
+            form {
+            display: flex;
+            flex-direction: column;
+            }        
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="heading">Contact <span>Me</span></h2>
+
+        <!-- Contact Form -->
+        <form id="contactForm">
+
+            <div class="div1">
+                <input type="text" id="name" name="name" placeholder="Full Name" required>
+                <span id="nameError" class="error"></span>
+    
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <span id="emailError" class="error"></span>
+        
+                <input type="tel" id="phone" name="phone" placeholder="Phone Number" pattern="[0-9]{10}" required>
+                <span id="phoneError" class="error"></span>
+        
+                <input type="text" id="subject" name="subject" placeholder="Subject" required>
+                <span id="subjectError" class="error"></span>
+            </div>
+
+            <div class="div">
+                <textarea id="message" name="message" rows="25" cols="50"  placeholder="Your Message" required></textarea>
+                <span id="messageError" class="error"></span>
+
+                <input type="submit" value="Send Message">
+            </div>
+
+            
+        </form>
+
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Clear previous error messages
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('phoneError').textContent = '';
+            document.getElementById('subjectError').textContent = '';
+            document.getElementById('messageError').textContent = '';
+
+            // Validation checks
+            let valid = true;
+            let name = document.getElementById('name').value.trim();
+            let email = document.getElementById('email').value.trim();
+            let phone = document.getElementById('phone').value.trim();
+            let subject = document.getElementById('subject').value.trim();
+            let message = document.getElementById('message').value.trim();
+
+            // Validate Name
+            if (name === '') {
+                document.getElementById('nameError').textContent = 'Name is required';
+                valid = false;
+            }
+
+            // Validate Email
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email)) {
+                document.getElementById('emailError').textContent = 'Enter a valid email';
+                valid = false;
+            }
+
+            // Validate Phone
+            const phonePattern = /^[0-9]{10}$/;
+            if (!phonePattern.test(phone)) {
+                document.getElementById('phoneError').textContent = 'Enter a valid 10-digit phone number';
+                valid = false;
+            }
+
+            // Validate Subject
+            if (subject === '') {
+                document.getElementById('subjectError').textContent = 'Subject is required';
+                valid = false;
+            }
+
+            // Validate Message
+            if (message === '') {
+                document.getElementById('messageError').textContent = 'Message is required';
+                valid = false;
+            }
+
+            // If the form is valid, redirect to the success page
+            if (valid) {
+                window.location.href = 'success_contact.html';
+            }
+        });
+    </script>
+</body>
+</html>
