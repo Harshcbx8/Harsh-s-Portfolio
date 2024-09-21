@@ -20,8 +20,8 @@ window.onscroll = () => {
 };
 
 menuIcon.onclick = () => {
-    menuIcon.classList.toggle('bx-x');
-    navbar.classList.toggle('active');
+    menuIcon.classList.toggle('bx-x'); // Change icon if needed
+    navbar.classList.toggle('active'); // Toggle the navbar visibility
 };
 
 // Physics Simulation and Improved Honeybee Pattern
@@ -58,56 +58,87 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Simulate icons converging into the center
         setTimeout(() => {
-            icon.style.transition = 'all 1s ease-out';
+            icon.style.transition = 'all 3s ease';
             icon.style.opacity = 1;
 
             const settledX = centerX - icon.offsetWidth / 2;
             const settledY = centerY - icon.offsetHeight / 2;
-
+            icon.style.transform = `scale(0.95)`;
             icon.style.left = `${settledX}px`;
             icon.style.top = `${settledY}px`;
 
             // After reaching the center, spread into the honeycomb pattern
             setTimeout(() => {
                 arrangeIconsInHoneycomb();
-            }, 1000 + index * 100); // Staggered spreading animation
-        }, index * 200); // Staggered start for convergence
+            }, 5000 + index * 100); // Staggered spreading animation
+        }, index * 150); // Staggered start for convergence
     });
 
-    // Arrange icons in a honeycomb pattern
-    function arrangeIconsInHoneycomb() {
-        let offsetIndex = 0;
-        const iconSize = icons[0].offsetWidth; // Assuming square icons
-        const spacing = iconSize * 1.2; // Add a little spacing between icons
-        const hexHeight = spacing * Math.sqrt(3) / 2; // Vertical spacing for hexagonal layout
+    // Arrange icons in a honeycomb pattern with pop-in animation
+function arrangeIconsInHoneycomb() {
+    let offsetIndex = 0;
+    const iconSize = icons[0].offsetWidth; // Assuming square icons
+    const spacing = iconSize * 1.4; // Add a little spacing between icons
+    const hexHeight = spacing * Math.sqrt(3) / 2; // Vertical spacing for hexagonal layout
 
-        // Generate honeycomb pattern by iterating in layers from the center outwards
-        let layer = 0;
-        let iconsToPlace = icons.length;
-        const maxIconsPerLayer = (layer) => 6 * layer || 1; // 1 icon at the center, then 6 per layer
+    // Generate honeycomb pattern by iterating in layers from the center outwards
+    let layer = 0;
+    let iconsToPlace = icons.length;
+    const maxIconsPerLayer = (layer) => 6 * layer || 1; // 1 icon at the center, then 6 per layer
 
-        while (iconsToPlace > 0) {
-            const iconsInThisLayer = Math.min(maxIconsPerLayer(layer), iconsToPlace);
-            for (let i = 0; i < iconsInThisLayer; i++) {
-                const angle = (i / iconsInThisLayer) * (2 * Math.PI); // Divide the circle for icons
-                const layerRadius = layer * spacing; // Increase distance with each layer
+    // Apply the honeycomb pattern positions
+    while (iconsToPlace > 0) {
+        const iconsInThisLayer = Math.min(maxIconsPerLayer(layer), iconsToPlace);
+        for (let i = 0; i < iconsInThisLayer; i++) {
+            const angle = (i / iconsInThisLayer) * (2 * Math.PI); // Divide the circle for icons
+            const layerRadius = layer * spacing; // Increase distance with each layer
 
-                const hexX = centerX + layerRadius * Math.cos(angle) - iconSize / 2;
-                const hexY = centerY + layerRadius * Math.sin(angle) - iconSize / 2;
+            const hexX = centerX + layerRadius * Math.cos(angle) - iconSize / 2;
+            const hexY = centerY + layerRadius * Math.sin(angle) - iconSize / 2;
 
-                if (offsetIndex < icons.length) {
-                    const icon = icons[offsetIndex];
-                    icon.style.transition = 'top 0.8s ease-in-out, left 0.8s ease-in-out';
-                    icon.style.left = `${hexX}px`;
-                    icon.style.top = `${hexY}px`;
-                    offsetIndex++;
-                }
+            if (offsetIndex < icons.length) {
+                const icon = icons[offsetIndex];
+
+                // Directly set the position in honeycomb pattern
+                icon.style.left = `${hexX}px`;
+                icon.style.top = `${hexY}px`;
+                icon.style.opacity = 0; // Set to 0 initially for animation
+
+                // Apply pop-in animation with staggered delay
+                setTimeout(() => {
+                    icon.style.opacity = 1;
+                    icon.style.transform = `scale(1.1)`; // Scale slightly larger
+                    icon.style.animation = 'popIn 0.6s ease-out forwards';
+                }, offsetIndex * 100); // Staggered delay for each icon
+
+                offsetIndex++;
             }
+        }
+        iconsToPlace -= iconsInThisLayer;
+        layer++; // Move to the next outer layer
+    }
+}
 
-            iconsToPlace -= iconsInThisLayer;
-            layer++; // Move to the next outer layer
+// Add the pop-in animation via CSS
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes popIn {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        70% {
+            transform: scale(1.2);
+            opacity: 0.5;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
         }
     }
+`;
+document.head.appendChild(style);
+
 
     // Event listener to arrange icons in a ring outside the circle
     circle.addEventListener('click', () => {
@@ -129,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Rotate icon to face outward
             const rotateDegree = angle * (180 / Math.PI) + 90;
-            icon.style.transform = `rotate(${rotateDegree}deg) scale(1.1)`;
+            icon.style.transform = `rotate(${rotateDegree}deg) scale(1)`;
         });
 
         setTimeout(() => {
