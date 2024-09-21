@@ -30,6 +30,9 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
 }
+span{
+    color:var(--personal-color);
+}
 
 /* Header */
 .header {
@@ -78,12 +81,11 @@ body {
     color: var(--personal-color);
     border-bottom: 3px solid var(--personal-color);
 }
-
+#buttn{
+    background-color: transparent;
+}
 #menu-icon {
     display: none;
-    backdrop-filter: blur(10px);
-    background-blend-mode: multiply;
-    background-color: rgb(0, 0, 0);
     font-size: 3.6rem;
     color: var(--main-color);
     cursor: pointer;
@@ -454,7 +456,7 @@ section {
     color: black;
     border: 2px solid var(--textnew-color);
     background-color: rgba(0, 255, 0);
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
     border-radius: 2rem;
 }
 
@@ -845,32 +847,41 @@ section {
     #menu-icon {
         display: block;
     }
-
+    
     .navbar {
         position: absolute;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
         top: 100%;
         right: 0;
-        width: 50%;
+        width: 100%;
         padding: 1rem 3%;
-        background-color: rgb(210, 255, 210);
-        backdrop-filter: blur(20px);
-        border-bottom-left-radius: 2rem;
-        border-left: 2px solid var(--main-color);
+        color: var(--text-color);
+        background-color:transparent;
+        margin-top: -2rem;
+        max-height: 0;
         border-bottom: 2px solid var(--main-color);
-        display: none;
+        overflow: hidden; /* Prevent overflow */
+        transition: max-height 0.8s ease, padding 0.5s ease; /* Transition for max-height */
     }
-
+    
     .navbar.active {
-        display: block;
+        margin-top: 0rem;
+        border-bottom-left-radius: 2rem;
+        border-bottom-right-radius: 2rem;
+        max-height: 300px; /* Arbitrary large value to allow expansion */
+        padding: 0.5rem 3%; /* Reset padding */
+        background-color: rgba(23, 23, 23, 0.3);
     }
-
+    
     .navbar a {
         display: block;
         font-size: 2rem;
         font-weight: 500;
-        margin: 3rem 0;
-        color: black;
+        margin: 0.8rem 0;
     }
+    
 
     .home {
         flex-direction: column-reverse;
