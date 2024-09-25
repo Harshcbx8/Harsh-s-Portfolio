@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function arrangeIconsInDynamicPattern() {
-        const patterns = ['honeycomb', 'circle', 'spiral', 'grid', 'random', 'star', 'staggered', 'ring', 'flower', 'wave', 'clover'];
+        const patterns = ['honeycomb','circle','spiral','grid','random','star','staggered','ring','flower','wave','clover'];
         const chosenPattern = patterns[Math.floor(Math.random() * patterns.length)];
 
         icons.forEach(icon => {
@@ -91,17 +91,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         setTimeout(() => {
             switch (chosenPattern) {
-                case 'honeycomb': arrangeInHoneycomb(); break;
-                case 'circle': arrangeInCircle(); break;
-                case 'spiral': arrangeInSpiral(); break;
-                case 'grid': arrangeInGrid(); break;
-                case 'random': arrangeRandomly(); break;
-                case 'star': arrangeInStar(); break;
-                case 'staggered': arrangeInStaggeredPattern(); break;
-                case 'ring': arrangeIconsInRing(); break;
-                case 'flower': arrangeInFlower(); break;
-                case 'wave': arrangeInWave(); break;
-                case 'clover': arrangeInClover(); break;
+                case 'honeycomb': arrangeInHoneycomb(); break; //Perfect
+                case 'circle': arrangeInCircle(); break; //Perfect
+                case 'spiral': arrangeInSpiral(); break; // Perfect
+                case 'grid': arrangeInGrid(); break; //Perfect
+                case 'random': arrangeIconsInJar(); break;
+                case 'star': arrangeInStar(); break; //Perfect
+                case 'staggered': arrangeInTrianglePattern(); break; //Perfecrt
+                case 'ring': arrangeIconsInRing(); break; // Perfect
+                case 'flower': arrangeInFlower(); break; //Perfect
+                case 'wave': arrangeInWave(); break; // perfect
+                case 'clover': arrangeInClover(); break; // perfect
             }
 
             icons.forEach((icon, index) => {
@@ -114,30 +114,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, index * 80);
             });
         }, 600);
+
         function arrangeInHoneycomb() {
+            const maxRadius = radius * 0.9; // Set maximum radius the honeycomb can reach, slightly within the main circle
+            const iconSize = icons[0].offsetWidth; // Ensure correct icon size
             let layer = 0;
             let iconsToPlace = icons.length;
-            const maxIconsPerLayer = (layer) => 6 * layer || 1;
-
+            let offsetIndex = 0; // Start placing icons from the first icon
+        
+            // Calculate the spacing based on the icon size and the desired space between them
+            const baseSpacing = iconSize * 1.2; // Adjust base spacing multiplier as needed
+        
+            // Function to determine maximum icons per layer
+            const maxIconsPerLayer = (layer) => (layer === 0 ? 1 : 6 * layer);
+        
             while (iconsToPlace > 0) {
                 const iconsInThisLayer = Math.min(maxIconsPerLayer(layer), iconsToPlace);
+        
+                // Calculate the radius for this layer, ensuring it doesn't exceed maxRadius
+                const layerRadius = layer * (baseSpacing * Math.sqrt(3) / 2);
+        
+                // Stop if the layer exceeds the defined circle's radius
+                if (layerRadius + iconSize / 2 > maxRadius) break;
+        
                 for (let i = 0; i < iconsInThisLayer; i++) {
+                    // Calculate the angle for this icon in the current layer
                     const angle = (i / iconsInThisLayer) * (2 * Math.PI);
-                    const layerRadius = layer * spacing;
+        
+                    // Calculate (x, y) positions relative to the center
                     const hexX = centerX + layerRadius * Math.cos(angle) - iconSize / 2;
                     const hexY = centerY + layerRadius * Math.sin(angle) - iconSize / 2;
-
+        
                     if (offsetIndex < icons.length) {
                         const icon = icons[offsetIndex++];
+                        icon.style.position = 'absolute';
                         icon.style.left = `${hexX}px`;
                         icon.style.top = `${hexY}px`;
                     }
                 }
+        
+                // Update counters for the next layer
                 iconsToPlace -= iconsInThisLayer;
                 layer++;
             }
         }
-
+        
         function arrangeInCircle() {
             const angleStep = (2 * Math.PI) / icons.length;
             icons.forEach((icon, index) => {
@@ -161,35 +182,86 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         function arrangeInGrid() {
-            const cols = Math.ceil(Math.sqrt(icons.length));
-            const spacing = 10; // Space between icons
+            const maxRadius = radius * 0.9; // Maximum allowable radius slightly inside the circle
+            const iconSize = icons[0].offsetWidth; // Assuming all icons have the same size
+            const spacing = iconSize * 0.2; // Set spacing as a percentage of icon size
+        
+            const numCols = Math.floor((2 * maxRadius) / (iconSize + spacing));
+            const numRows = Math.ceil(icons.length / numCols);
+        
+            const offsetX = centerX - (numCols * (iconSize + spacing)) / 2 + spacing / 2;
+            const offsetY = centerY - (numRows * (iconSize + spacing)) / 2 + spacing / 2;
+        
             icons.forEach((icon, index) => {
-                const row = Math.floor(index / cols);
-                const col = index % cols;
-                const gridX = centerX + (col - cols / 2) * (icon.offsetWidth + spacing);
-                const gridY = centerY + (row - cols / 2) * (icon.offsetHeight + spacing);
-                icon.style.left = `${gridX}px`;
-                icon.style.top = `${gridY}px`;
+                const col = index % numCols;
+                const row = Math.floor(index / numCols);
+        
+                // Calculate the position of the icon
+                let gridX = offsetX + col * (iconSize + spacing);
+                let gridY = offsetY + row * (iconSize + spacing);
+        
+                // Check if the icon is still inside the circle boundary
+                const distanceFromCenter = Math.sqrt(Math.pow(gridX + iconSize / 2 - centerX, 2) + Math.pow(gridY + iconSize / 2 - centerY, 2));
+                if (distanceFromCenter + iconSize / 2 <= maxRadius) {
+                    // If within circle, place the icon
+                    icon.style.position = 'absolute';
+                    icon.style.left = `${gridX}px`;
+                    icon.style.top = `${gridY}px`;
+                } 
             });
         }
         
-        function arrangeRandomly() {
+        
+        function arrangeIconsInJar() {
+            const circleRect = circle.getBoundingClientRect();
+            const radius = circleRect.width / 2; // Get the radius of the circle
+            const centerX = circleRect.width / 2; // Center X of the circle
+            const centerY = circleRect.height / 2; // Center Y of the circle
+        
+            const spacing = 10; // Adjust spacing between icons
+            const iconHeight = icons[0].offsetHeight; // Height of each icon
+            const iconWidth = icons[0].offsetWidth; // Width of each icon
+            const maxIconsPerRow = Math.floor((radius * 2) / (iconWidth + spacing)); // Maximum icons that fit in a row
+            const maxRows = Math.floor((radius * 2) / (iconHeight + spacing)); // Maximum rows based on icon height
+            const totalHeight = maxRows * (iconHeight + spacing); // Total height needed for all icons
+            const startY = centerY - (totalHeight / 2); // Starting Y position to center the icons vertically
+        
+            // Clear previous positions and hide icons initially
             icons.forEach(icon => {
-                const angle = Math.random() * 2 * Math.PI;
-                const randomRadius = Math.random() * (radius * 0.8);
-                const randomX = centerX + randomRadius * Math.cos(angle) - icon.offsetWidth / 2;
-                const randomY = centerY + randomRadius * Math.sin(angle) - icon.offsetHeight / 2;
-                icon.style.left = `${randomX}px`;
-                icon.style.top = `${randomY}px`;
+                icon.style.position = 'absolute';
+                icon.style.opacity = '0'; // Hide initially
+            });
+        
+            // Loop through each icon and place it
+            icons.forEach((icon, index) => {
+                const row = Math.floor(index / maxIconsPerRow); // Determine the current row based on index
+                const col = index % maxIconsPerRow; // Determine the current column based on index
+        
+                // Calculate the icon's X and Y positions
+                const iconX = centerX - (maxIconsPerRow * (iconWidth + spacing)) / 2 + (col * (iconWidth + spacing)); // Centering horizontally
+                const iconY = startY + (row * (iconHeight + spacing)); // Set Y position
+        
+                // Set the icon's position
+                icon.style.left = `${iconX}px`; // Set X position
+                icon.style.top = `${iconY}px`; // Set Y position
+        
+                // Show icon with a fade-in effect
+                setTimeout(() => {
+                    icon.style.opacity = '1'; // Show icon
+                    icon.style.transition = 'opacity 0.5s ease'; // Fade-in transition
+                }, index * 50); // Delay for each icon to appear sequentially
             });
         }
+        
         
         function arrangeInStar() {
             const spikes = 5;
             const step = (2 * Math.PI) / spikes;
+            const spacing = 2; // Adjust this value to increase/decrease space between icons
+        
             icons.forEach((icon, index) => {
                 const angle = step * index;
-                const starRadius = radius * (index % 2 === 0 ? 0.5 : 0.25); // Adjusted radius
+                const starRadius = radius * (index % 2 === 0 ? 0.5 : 0.25) + (spacing * index); // Adjusted radius with spacing
                 const starX = centerX + starRadius * Math.cos(angle) - icon.offsetWidth / 2;
                 const starY = centerY + starRadius * Math.sin(angle) - icon.offsetHeight / 2;
                 icon.style.left = `${starX}px`;
@@ -197,26 +269,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         
-        function arrangeInStaggeredPattern() {
-            const maxIconsPerRow = 5;
-            const iconSize = icons[0].offsetWidth;
-            const spacingX = iconSize * 1.5;
-            const spacingY = iconSize * 1.2;
+        
+        function arrangeInTrianglePattern() {
+            const iconSize = icons[0].offsetWidth; // Assuming all icons have the same size
+            const spacing = iconSize * 1.3; // Adjust spacing between icons
         
             icons.forEach((icon, index) => {
-                const row = Math.floor(index / maxIconsPerRow);
-                const col = index % maxIconsPerRow;
+                // Calculate which row this icon is in
+                const row = Math.floor((Math.sqrt(1 + 8 * index) - 1) / 2);
+                const col = index - (row * (row + 1)) / 2; // Number of icons in the current row
         
-                let staggerX = centerX + (col - (maxIconsPerRow - 1) / 2) * spacingX;
-                let staggerY = centerY + (row - (icons.length / maxIconsPerRow - 1) / 2) * spacingY;
+                // Calculate x and y positions for each icon
+                const xOffset = (row * spacing)/2; // Offset to center the triangle
+                const staggerX = centerX-20 + (col * spacing) - xOffset; // Center the icons horizontally
+                const staggerY = (row * spacing); // Position them vertically downwards
         
-                const distanceFromCenter = Math.sqrt((staggerX - centerX) ** 2 + (staggerY - centerY) ** 2);
-                if (distanceFromCenter + iconSize / 2 > radius) {
-                    const angle = Math.atan2(staggerY - centerY, staggerX - centerX);
-                    staggerX = centerX + (radius - iconSize / 2) * Math.cos(angle);
-                    staggerY = centerY + (radius - iconSize / 2) * Math.sin(angle);
-                }
-        
+                // Position the icon
+                // icon.style.position = 'absolute'; // Ensure absolute positioning
                 icon.style.left = `${staggerX}px`;
                 icon.style.top = `${staggerY}px`;
             });
