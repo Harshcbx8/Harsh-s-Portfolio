@@ -3,6 +3,37 @@ let navbar = document.querySelector('.navbar');
 let sections = document.querySelectorAll('section');
 let navLinks = document.querySelectorAll('header nav a');
 
+
+function toggleContent(contentId) {
+    const content = document.getElementById(`content-${contentId}`);
+    const allContent = document.querySelectorAll('.timeline-content');
+    const verticalLine = document.getElementById(`vl-${contentId}`);
+    const horizontalLine = document.getElementById(`hl-${contentId}`);
+
+    // Hide all content except the selected one
+    allContent.forEach((item, index) => {
+        if (item !== content) {
+            item.classList.remove('active');
+            const lineId = item.id.split('-')[1];
+            document.getElementById(`vl-${lineId}`).style.height = "14.5rem";
+            document.getElementById(`hl-${lineId}`).style.top = "150%";
+        }
+    });
+
+    // Toggle the visibility of the selected content
+    content.classList.toggle('active');
+
+    // Adjust vertical and horizontal lines based on content visibility
+    if (content.classList.contains('active')) {
+        const contentHeight = content.scrollHeight;
+        verticalLine.style.height = `${contentHeight + 140}px`; // Extend vertical line just to connect
+        horizontalLine.style.top = `${contentHeight + 103}px`; // Move horizontal line to just below content
+    } else {
+        verticalLine.style.height = "14.5rem"; // Default height
+        horizontalLine.style.top = "150%"; // Reset horizontal line
+    }
+}
+
 window.onscroll = () => {
     let top = window.scrollY;
     sections.forEach(sec => {
