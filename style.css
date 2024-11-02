@@ -494,7 +494,8 @@ section {
     position: relative;
     background: linear-gradient(rgba(30, 30, 30, 0.400), rgba(0,255,0,0.10));
     border: 2px solid var(--main-color);
-    border-radius: 1rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
     width: 100%;
     cursor: pointer;
     display: flex;
@@ -560,19 +561,27 @@ section {
     top: 150%;
 }
 
+.hl-last{
+    display: none;
+}
+
 /* Timeline Content */
 .timeline-content {
-    display: none;
-    padding: 20px;
+    display: block;
+    padding: 0 20px; /* Set initial padding for smooth expansion */
     width: 100%;
-    background-color: rgba(63, 63, 63, 0.400);
+    background-color: rgba(63, 63, 63, 0.4);
     color: #fff;
     line-height: 1.5;
     border-radius: 0 0 1rem 1rem;
+    box-shadow: 0px 0px 15px rgb(0, 255, 0, 0.6);
     font-weight: 600;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease-in-out;
+    opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
 .timeline-content h3 {
@@ -586,9 +595,12 @@ section {
 }
 
 .timeline-content.active {
-    display: block;
-    max-height: 500px; /* Adjust based on content size */
+    max-height: 500px; /* Controls max height when active */
+    opacity: 1;
+    transform: scaleY(1);
+    padding: 20px;
 }
+
 
 /* Scrollbar Customization */
 ::-webkit-scrollbar {
