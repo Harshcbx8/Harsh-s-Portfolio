@@ -2,6 +2,218 @@ let menuIcon = document.querySelector('#menu-icon');
 let navbar = document.querySelector('.navbar');
 let sections = document.querySelectorAll('section');
 let navLinks = document.querySelectorAll('header nav a');
+let currentSlide = 0;
+let autoSlideInterval;
+let isExpanded = false;
+let isDragging = false;
+let startY = 0;
+let scrollTop = 0;
+
+// Initialize
+function initializeProjects() {
+    createDots();
+    setupEventListeners();
+    if (window.innerWidth <= 768 && !isExpanded) {
+        startAutoSlide();
+    }
+    updateDots();
+}
+
+// Create dots
+function createDots() {
+    const projectBoxes = document.querySelectorAll('.project-box');
+    const dotsContainer = document.querySelector('.slide-dots');
+    dotsContainer.innerHTML = '';
+    
+    projectBoxes.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        dot.onclick = () => goToSlide(index);
+        dotsContainer.appendChild(dot);
+    });
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    const slider = document.querySelector('.project-slider');
+    
+    // Mouse events
+    slider.addEventListener('mousedown', startDragging);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+    
+    // Touch events
+    slider.addEventListener('touchstart', startDragging);
+    slider.addEventListener('touchmove', drag);
+    slider.addEventListener('touchend', stopDragging);
+    
+    // Prevent default scrolling when in slider mode
+    slider.addEventListener('wheel', (e) => {
+        if (!isExpanded) {
+            e.preventDefault();
+            moveSlide(e.deltaY > 0 ? 'down' : 'up');
+        }
+    });
+}
+
+// Dragging functions
+function startDragging(e) {
+    if (isExpanded) return;
+    
+    isDragging = true;
+    startY = e.type === 'mousedown' ? e.pageY : e.touches[0].pageY;
+    scrollTop = currentSlide * document.querySelector('.project-box').offsetHeight;
+    
+    // Stop auto-slide while dragging
+    stopAutoSlide();
+}
+
+function drag(e) {
+    if (!isDragging || isExpanded) return;
+    e.preventDefault();
+    
+    const y = e.type === 'mousemove' ? e.pageY : e.touches[0].pageY;
+    const walk = (startY - y) * 1.5; // Multiplier for faster response
+    
+    // Update slide position while dragging
+    const slider = document.querySelector('.project-slider');
+    const boxes = document.querySelectorAll('.project-box');
+    boxes.forEach(box => {
+        box.style.transform = `translateY(${-scrollTop - walk}px)`;
+    });
+}
+
+function stopDragging(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const y = e.type === 'mouseup' ? e.pageY : e.changedTouches[0].pageY;
+    const walk = startY - y;
+    
+    // Determine direction and move slide
+    if (Math.abs(walk) > 50) {
+        moveSlide(walk > 0 ? 'down' : 'up');
+    } else {
+        // Snap back to current slide if movement was too small
+        updateSlidePosition();
+    }
+    
+    // Restart auto-slide
+    startAutoSlide();
+}
+
+// Toggle view
+function toggleView() {
+    const slider = document.querySelector('.project-slider');
+    const btn = document.querySelector('.view-toggle-btn');
+    const arrows = document.querySelector('.nav-arrows');
+    const dots = document.querySelector('.slide-dots');
+    
+    isExpanded = !isExpanded;
+    slider.classList.toggle('expanded');
+    
+    // Update button text and controls visibility
+    btn.querySelector('.toggle-text').textContent = isExpanded ? 'Collapse Projects' : 'View All Projects';
+    arrows.style.display = isExpanded ? 'none' : 'flex';
+    dots.style.display = isExpanded ? 'none' : 'flex';
+    
+    // Handle auto-slide
+    if (isExpanded) {
+        stopAutoSlide();
+        // Reset transforms
+        document.querySelectorAll('.project-box').forEach(box => {
+            box.style.transform = '';
+        });
+    } else {
+        currentSlide = 0;
+        updateSlidePosition();
+        startAutoSlide();
+    }
+}
+
+// Slide movement
+function moveSlide(direction) {
+    if (isExpanded) return;
+    
+    const boxes = document.querySelectorAll('.project-box');
+    stopAutoSlide();
+    
+    if (direction === 'up' && currentSlide > 0) {
+        currentSlide--;
+    } else if (direction === 'down' && currentSlide < boxes.length - 1) {
+        currentSlide++;
+    }
+    
+    updateSlidePosition();
+    startAutoSlide();
+}
+
+// Go to specific slide
+function goToSlide(index) {
+    if (isExpanded) return;
+    
+    stopAutoSlide();
+    currentSlide = index;
+    updateSlidePosition();
+    startAutoSlide();
+}
+
+// Update slide positions
+function updateSlidePosition() {
+    if (isExpanded) return;
+    
+    const boxes = document.querySelectorAll('.project-box');
+    const slideHeight = boxes[0].offsetHeight;
+    
+    boxes.forEach(box => {
+        box.style.transform = `translateY(${-currentSlide * slideHeight}px)`;
+    });
+    
+    updateDots();
+}
+
+// Update dots
+function updateDots() {
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+    });
+}
+
+// Auto-slide functions
+function startAutoSlide() {
+    if (isExpanded || window.innerWidth > 768) return;
+    
+    stopAutoSlide();
+    autoSlideInterval = setInterval(() => {
+        const boxes = document.querySelectorAll('.project-box');
+        if (currentSlide < boxes.length - 1) {
+            currentSlide++;
+        } else {
+            currentSlide = 0;
+        }
+        updateSlidePosition();
+    }, 3000);
+}
+
+function stopAutoSlide() {
+    clearInterval(autoSlideInterval);
+}
+
+// Window resize handler
+window.addEventListener('resize', () => {
+    if (window.innerWidth <= 768 && !isExpanded) {
+        startAutoSlide();
+    } else {
+        stopAutoSlide();
+    }
+    updateSlidePosition();
+});
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', initializeProjects);
+
+
 
 
 function toggleContent(contentId) {

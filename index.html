@@ -154,62 +154,82 @@
                 </div>
             </div>
         </div>
+        
     </section>
     
 
-    <section class="projects" id="projects" >
+<!-- Projects Section -->
+<section class="projects" id="projects">
+    <h2 class="heading">Projects</h2>
 
-   <h2 class="heading">Projests</h2>
-
-   <div class="project-container">
-
-    <div class="project-box">
-        <div class="project-info">
-            <h4><img src="—Pngtree—sport logo image_2760635.png" alt="Sports"> Sports plays <a href="https://harshcbx8.github.io/SportsPlays/"><h4><i class='bx bx-link-external' ></i></h4></a></h4>
-
-            <div class="containt">
-                <h3>Description:</h3>
-                <p>developed the front-end of a sports plays website designed to showcase various sports and strategies. The website features an interactive and visually appealing interface that allows users to explore detailed play diagrams, game strategies, and sport-specific tactics. It incorporates responsive design principles to ensure accessibility across different devices. </p><br>
-                <h3>Technologies Used:</h3>
-                <p>[HTML, CSS, JavaScript, GitHub]</p><br>
-                <h3>Position:</h3>
-                <p>As the front-end developer, I was responsible for designing and implementing the user interface, ensuring cross-browser compatibility, and optimizing the website for performance. My role involved creating responsive layouts, integrating interactive elements, and ensuring a seamless user experience.</p><br>
-                <h3>Learnings and Benefits:</h3>
-                <p>Enhanced Skills: Gained hands-on experience in using modern front-end technologies and frameworks.</p>
-                <p>Responsive Design: Improved my ability to create websites that work well on various devices and screen sizes.</p>
-                <p>User Experience: Learned to focus on usability and user interaction, enhancing the overall user experience.</p>
-                <p>Project Management: Developed skills in managing project requirements and delivering a polished final product.</p>
-                <p>Real-world Application: Applied theoretical knowledge to a practical project, bridging the gap between learning and real-world implementation.</p>
+    <!-- Project Container -->
+    <div class="project-container">
+        <div class="project-slider">
+            <!-- Project 1 -->
+            <div class="project-box proj-bx-first" data-index="0">
+                <div class="project-info">
+                    <h4>
+                        <img src="—Pngtree—sport logo image_2760635.png" alt="Sports">
+                        Sports Plays
+                        <a href="https://harshcbx8.github.io/SportsPlays/" target="_blank">
+                            <i class="bx bx-link-external"></i>
+                        </a>
+                    </h4>
+                    <div class="content">
+                        <h3>Description:</h3>
+                        <p>Developed the front-end of a sports plays website...</p>
+                        <h3>Technologies Used:</h3>
+                        <p>[HTML, CSS, JavaScript, GitHub]</p>
+                        <h3>Position:</h3>
+                        <p>Front-end Developer</p>
+                        <h3>Learnings and Benefits:</h3>
+                        <p>Enhanced Skills, Responsive Design...</p>
+                    </div>
+                </div>
             </div>
-
-        </div>
-    </div>
-
-    <div class="project-box">
-        <div class="project-info">
-            <h4>SOON <img src="" alt=""></h4>
             
-            <p>Comming Soon!</p>
+            <!-- Additional Projects -->
+            <div class="project-box" data-index="1">
+                <div class="project-info">
+                    <h4>SOON</h4>
+                    <p>Coming Soon!</p>
+                </div>
+            </div>
+            <div class="project-box" data-index="2">
+                <div class="project-info">
+                    <h4>SOON</h4>
+                    <p>Coming Soon!</p>
+                </div>
+            </div>
+            <div class="project-box proj-bx-last" data-index="3">
+                <div class="project-info">
+                    <h4>SOON</h4>
+                    <p>Coming Soon!</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="project-box">
-        <div class="project-info">
-            <h4>SOON <img src="" alt=""></h4>
-           
-            <p>Comming Soon!</p>
-        </div>
-    </div>
-    <div class="project-box">
-        <div class="project-info">
-            <h4>SOON  <img src="" alt=""></h4>
-          
-            <p>Comming Soon!</p>
-        </div>
-    </div>
-   </div>
-    </section>
 
-    <section class="achivement" id="achivement" >
+        
+    <!-- View Controls -->
+    <div class="view-controls">
+        <button class="view-toggle-btn" onclick="toggleView()">
+            <span class="toggle-text">View All Projects</span>
+        </button>
+        <!-- Slide Dots -->
+        <div class="slide-dots"></div>
+        <!-- Navigation Arrows -->
+        <div class="nav-arrows">
+            <button onclick="moveSlide('up')" class="nav-btn up">&#9650;</button>
+            <button onclick="moveSlide('down')" class="nav-btn down">&#9660;</button>
+        </div>
+    </div>
+    
+</section>
+
+     
+
+<section class="achivement" id="achivement" >
          <div class="achivement-box">
             <h2 class="heading">Achivements</h2>
 
