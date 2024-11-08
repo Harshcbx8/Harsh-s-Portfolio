@@ -215,7 +215,6 @@ document.addEventListener('DOMContentLoaded', initializeProjects);
 
 
 
-
 function toggleContent(contentId) {
     const content = document.getElementById(`content-${contentId}`);
     const allContent = document.querySelectorAll('.timeline-content');
@@ -223,12 +222,20 @@ function toggleContent(contentId) {
     const horizontalLine = document.getElementById(`hl-${contentId}`);
 
     // Hide all content except the selected one
-    allContent.forEach((item, index) => {
+    allContent.forEach((item) => {
         if (item !== content) {
             item.classList.remove('active');
             const lineId = item.id.split('-')[1];
-            document.getElementById(`vl-${lineId}`).style.height = "14.5rem";
-            document.getElementById(`hl-${lineId}`).style.top = "150%";
+            const otherVerticalLine = document.getElementById(`vl-${lineId}`);
+            const otherHorizontalLine = document.getElementById(`hl-${lineId}`);
+            
+            if (window.matchMedia("(max-width: 700px)").matches) {
+                otherVerticalLine.style.height = "13rem"; // Adjust for mobile view
+                otherHorizontalLine.style.top = "160%";
+            } else {
+                otherVerticalLine.style.height = "14.5rem"; // Default height for larger screens
+                otherHorizontalLine.style.top = "150%";
+            }
         }
     });
 
@@ -238,13 +245,24 @@ function toggleContent(contentId) {
     // Adjust vertical and horizontal lines based on content visibility
     if (content.classList.contains('active')) {
         const contentHeight = content.scrollHeight;
-        verticalLine.style.height = `${contentHeight + 140}px`; // Extend vertical line just to connect
-        horizontalLine.style.top = `${contentHeight + 103}px`; // Move horizontal line to just below content
+        if (window.matchMedia("(max-width: 700px)").matches) {
+            verticalLine.style.height = `${contentHeight + 114}px`; // Adjusted for mobile view
+            horizontalLine.style.top = `${contentHeight + 82}px`;
+        } else {
+            verticalLine.style.height = `${contentHeight + 140}px`; // Default for larger screens
+            horizontalLine.style.top = `${contentHeight + 103}px`;
+        }
     } else {
-        verticalLine.style.height = "14.5rem"; // Default height
-        horizontalLine.style.top = "150%"; // Reset horizontal line
+        if (window.matchMedia("(max-width: 700px)").matches) {
+            verticalLine.style.height = "13rem"; // Reset height for mobile
+            horizontalLine.style.top = "160%";
+        } else {
+            verticalLine.style.height = "14.5rem"; // Default height for larger screens
+            horizontalLine.style.top = "150%";
+        }
     }
 }
+
 
 window.onscroll = () => {
     let top = window.scrollY;
