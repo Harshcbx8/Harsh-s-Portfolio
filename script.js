@@ -12,9 +12,9 @@ let scrollTop = 0;
 // Initialize
 function initializeProjects() {
     createDots();
-    setupEventListeners();
     if (window.innerWidth <= 768 && !isExpanded) {
         startAutoSlide();
+        setupEventListeners();
     }
     updateDots();
 }
@@ -106,7 +106,6 @@ function stopDragging(e) {
 function toggleView() {
     const slider = document.querySelector('.project-slider');
     const btn = document.querySelector('.view-toggle-btn');
-    const arrows = document.querySelector('.nav-arrows');
     const dots = document.querySelector('.slide-dots');
     
     isExpanded = !isExpanded;
@@ -114,7 +113,6 @@ function toggleView() {
     
     // Update button text and controls visibility
     btn.querySelector('.toggle-text').textContent = isExpanded ? 'Collapse Projects' : 'View All Projects';
-    arrows.style.display = isExpanded ? 'none' : 'flex';
     dots.style.display = isExpanded ? 'none' : 'flex';
     
     // Handle auto-slide

@@ -800,7 +800,7 @@ section {
         grid-template-columns: 1fr;
         gap: 2rem;
         overflow: visible;
-        max-height: none;
+        /* max-height: auto; */
     }
 
     /* View Controls Mobile */
