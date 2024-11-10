@@ -878,8 +878,12 @@ section {
     width: 15rem;
     object-fit: cover;
     background-color: white;
-    border: 1px solid var(--main-color);
     border-radius: 5px;
+}
+
+.achiv-hack img{
+    border: none;
+    background-color:inherit;
 }
 
 .wrapper {
