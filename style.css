@@ -63,7 +63,7 @@ span{
 }
 
 .headlogo span {
-    text-shadow: 0 0 20px var(--main-color);
+    /* text-shadow: 0 0 20px var(--main-color); */
     color: var(--personal-color);
 }
 
