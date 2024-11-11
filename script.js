@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 transition: 'left 1.2s ease, top 1.2s ease, transform 1.2s ease',
                 left: `${iconPosition.x}px`,
                 top: `${iconPosition.y}px`,
-                transform: `rotate(${angle * (180 / Math.PI) + 90}deg) scale(1.1)`
+                transform: `rotate(${angle * (180 / Math.PI) + 90}deg) scale(1.05)`
             });
         });
 
