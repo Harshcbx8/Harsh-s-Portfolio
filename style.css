@@ -620,6 +620,15 @@ section {
     padding: 20px;
 }
 
+.timeline-item:hover{
+    color: black;
+    border: 2px solid var(--personal-color);
+    background-color: rgba(0, 255, 0, 0.8);
+}
+.timeline-item:hover .timeline-date{
+    color: black;
+}
+
 
 /* Scrollbar Customization */
 ::-webkit-scrollbar {
@@ -669,7 +678,7 @@ section {
 }
 
 .view-toggle-btn:hover {
-    background-color: rgba(0, 255, 0, 0.9);
+    background-color: rgba(0, 255, 0, 0.8);
 }
 .toggle-text{
     font-size: 1.8rem;
@@ -884,7 +893,7 @@ section {
     min-height: 45rem;
     max-width: 40rem;
     background-color: rgb(12, 12, 12);
-    border: 1px solid var(--main-color);
+    border: 2px solid var(--main-color);
     border-radius: 2rem;
     margin: 0 2rem;
     padding: 30px 60px;
@@ -1308,7 +1317,7 @@ section {
     .info {
         margin: auto;
         grid-template-columns: repeat(1, 1fr);
-        gap: 10rem;
+        gap: 5rem;
     }
     .me p {
         padding-left: 2rem;
