@@ -281,6 +281,9 @@ menuIcon.onclick = () => {
     navbar.classList.toggle('active');
 };
 
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const icons = document.querySelectorAll('.logo');
     const circle = document.querySelector('.circle');
@@ -361,24 +364,27 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     
         let isRunning = true; // Track if the animation is running
-        const gravityStrength = 0.8; // Gravity strength
-        const damping = 0.8; // Damping factor to simulate air resistance
+        const gravityStrength = 0.6; // Gravity strength
+        const damping = 0.78; // Damping factor to simulate air resistance
         const iconRadius = radius * 0.95; // Boundary radius for the icons
-        let spreadingComplete = false; // Track if spreading is complete
+        let spreadingComplete = true; // Track if spreading is complete
         
         // Calculate the angle increment based on the number of icons
         const angleIncrement = (2 * Math.PI) / icons.length;
         // Initial positioning: Spread icons horizontally and start above the circle center
         iconData.forEach((icon, index) => {
             const angle = index * angleIncrement;
-        
-                // Calculate offsets based on the angle and screen size
-                const offsetX = Math.cos(angle) * (window.innerWidth * 1); // 40% of screen size
-                const offsetY = Math.sin(angle) * (window.innerHeight * 1); // 40% of screen size
+            
+            // Calculate offsets based on the angle and screen size
+                const offsetX = Math.cos(angle) * (window.innerWidth * 1); 
+                const offsetY = Math.sin(angle) * (window.innerHeight * 0.8);
+               
 
                 // Set icon's initial position
                 icon.x = centerX + offsetX;
                 icon.y = centerY + offsetY;
+
+               
             // Apply CSS transition for the initial spreading
             Object.assign(icon.element.style, {
                 left: `${icon.x}px`,
@@ -431,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const dx = icon.x - otherIcon.x;
                             const dy = icon.y - otherIcon.y;
                             const distance = Math.sqrt(dx * dx + dy * dy);
-                            const minDistance = (icon.width + otherIcon.width) / 2 + 10; // Add spacing
+                            const minDistance = (icon.width + otherIcon.width) / 2 + 5; // Add spacing
     
                             if (distance < minDistance) {
                                 // Calculate overlap
@@ -484,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const angle = index * angleStep;
             const iconPosition = {
                 x: centerX + (radius * 1.2) * Math.cos(angle) - icon.offsetWidth / 2,
-                y: centerY + (radius * 1.2) * Math.sin(angle) - icon.offsetHeight / 2
+                y: centerY + (radius * 1.2) * Math.sin(angle) - icon.offsetHeight / 2 
             };
 
             Object.assign(icon.style, {
@@ -492,13 +498,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 transition: 'left 1.2s ease, top 1.2s ease, transform 1.2s ease',
                 left: `${iconPosition.x}px`,
                 top: `${iconPosition.y}px`,
-                transform: `rotate(${angle * (180 / Math.PI) + 90}deg) scale(1.05)`
+                transform: `rotate(${angle * (180 / Math.PI) + 90}deg) scale(0.95)`
             });
         });
 
         setTimeout(() => icons.forEach(icon => icon.style.opacity = 1), 400);
     }
+
+    
 // Draggable icons optimized
+
 icons.forEach(icon => {
     const startDrag = event => {
         event.preventDefault();
