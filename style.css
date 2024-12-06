@@ -334,6 +334,14 @@ section {
         font-size: 1.6rem;
     }
 }
+@media (max-width: 383px) {
+    .update span h5{
+        font-size: 1.3rem;
+    }
+    .SIH .update{
+        font-size: 1.3rem;
+    }
+}
 
 
 
