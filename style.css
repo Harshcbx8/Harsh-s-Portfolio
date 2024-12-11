@@ -689,6 +689,7 @@ section {
     background-color: rgba(0, 255, 0, 0.8);
 }
 .toggle-text{
+    color: white;
     font-size: 1.8rem;
     font-weight: 500;
 }
