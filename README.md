@@ -22,7 +22,7 @@ Welcome to my personal portfolio website! This project showcases my skills, proj
 
 ## 🌍 Live Demo
 
-Check out the live version here: [https://harshcbx8.github.io/Harsh-s-Portfolio/](https://Harsh-s-Portfolio/)
+Check out the live version here: [https://harshcbx8.github.io/Harsh-s-Portfolio/](https://harshcbx8.github.io/Harsh-s-Portfolio/)
 
 ## 📁 Folder Structure
 portfolio/
