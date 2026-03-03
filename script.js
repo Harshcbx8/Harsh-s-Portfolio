@@ -1,7 +1,12 @@
+// ============================================
+// GLOBAL VARIABLES & DOM ELEMENTS
+// ============================================
 let menuIcon = document.querySelector('#menu-icon');
 let navbar = document.querySelector('.navbar');
 let sections = document.querySelectorAll('section');
 let navLinks = document.querySelectorAll('header nav a');
+
+// Project Slider Variables
 let currentSlide = 0;
 let autoSlideInterval;
 let isExpanded = false;
@@ -9,7 +14,11 @@ let isDragging = false;
 let startY = 0;
 let scrollTop = 0;
 
-// Initialize
+
+// ============================================
+// PROJECT SLIDER FUNCTIONALITY
+// ============================================
+
 function initializeProjects() {
     createDots();
     if (window.innerWidth <= 768 && !isExpanded) {
@@ -19,7 +28,6 @@ function initializeProjects() {
     updateDots();
 }
 
-// Create dots
 function createDots() {
     const projectBoxes = document.querySelectorAll('.project-box');
     const dotsContainer = document.querySelector('.slide-dots');
@@ -33,21 +41,16 @@ function createDots() {
     });
 }
 
-// Setup event listeners
 function setupEventListeners() {
     const slider = document.querySelector('.project-slider');
     
-    // Mouse events
     slider.addEventListener('mousedown', startDragging);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDragging);
-    
-    // Touch events
     slider.addEventListener('touchstart', startDragging);
-    slider.addEventListener('touchmove', drag);
-    slider.addEventListener('touchend', stopDragging);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag);
+    document.addEventListener('mouseup', stopDragging);
+    document.addEventListener('touchend', stopDragging);
     
-    // Prevent default scrolling when in slider mode
     slider.addEventListener('wheel', (e) => {
         if (!isExpanded) {
             e.preventDefault();
@@ -56,15 +59,12 @@ function setupEventListeners() {
     });
 }
 
-// Dragging functions
 function startDragging(e) {
     if (isExpanded) return;
     
     isDragging = true;
     startY = e.type === 'mousedown' ? e.pageY : e.touches[0].pageY;
     scrollTop = currentSlide * document.querySelector('.project-box').offsetHeight;
-    
-    // Stop auto-slide while dragging
     stopAutoSlide();
 }
 
@@ -73,11 +73,9 @@ function drag(e) {
     e.preventDefault();
     
     const y = e.type === 'mousemove' ? e.pageY : e.touches[0].pageY;
-    const walk = (startY - y) * 1.5; // Multiplier for faster response
-    
-    // Update slide position while dragging
-    const slider = document.querySelector('.project-slider');
+    const walk = (startY - y) * 1.5;
     const boxes = document.querySelectorAll('.project-box');
+    
     boxes.forEach(box => {
         box.style.transform = `translateY(${-scrollTop - walk}px)`;
     });
@@ -90,46 +88,15 @@ function stopDragging(e) {
     const y = e.type === 'mouseup' ? e.pageY : e.changedTouches[0].pageY;
     const walk = startY - y;
     
-    // Determine direction and move slide
     if (Math.abs(walk) > 50) {
         moveSlide(walk > 0 ? 'down' : 'up');
     } else {
-        // Snap back to current slide if movement was too small
         updateSlidePosition();
     }
     
-    // Restart auto-slide
     startAutoSlide();
 }
 
-// Toggle view
-function toggleView() {
-    const slider = document.querySelector('.project-slider');
-    const btn = document.querySelector('.view-toggle-btn');
-    const dots = document.querySelector('.slide-dots');
-    
-    isExpanded = !isExpanded;
-    slider.classList.toggle('expanded');
-    
-    // Update button text and controls visibility
-    btn.querySelector('.toggle-text').textContent = isExpanded ? 'Collapse Projects' : 'View All Projects';
-    dots.style.display = isExpanded ? 'none' : 'flex';
-    
-    // Handle auto-slide
-    if (isExpanded) {
-        stopAutoSlide();
-        // Reset transforms
-        document.querySelectorAll('.project-box').forEach(box => {
-            box.style.transform = '';
-        });
-    } else {
-        currentSlide = 0;
-        updateSlidePosition();
-        startAutoSlide();
-    }
-}
-
-// Slide movement
 function moveSlide(direction) {
     if (isExpanded) return;
     
@@ -146,7 +113,6 @@ function moveSlide(direction) {
     startAutoSlide();
 }
 
-// Go to specific slide
 function goToSlide(index) {
     if (isExpanded) return;
     
@@ -156,7 +122,6 @@ function goToSlide(index) {
     startAutoSlide();
 }
 
-// Update slide positions
 function updateSlidePosition() {
     if (isExpanded) return;
     
@@ -170,7 +135,6 @@ function updateSlidePosition() {
     updateDots();
 }
 
-// Update dots
 function updateDots() {
     const dots = document.querySelectorAll('.dot');
     dots.forEach((dot, index) => {
@@ -178,18 +142,13 @@ function updateDots() {
     });
 }
 
-// Auto-slide functions
 function startAutoSlide() {
     if (isExpanded || window.innerWidth > 768) return;
     
     stopAutoSlide();
     autoSlideInterval = setInterval(() => {
         const boxes = document.querySelectorAll('.project-box');
-        if (currentSlide < boxes.length - 1) {
-            currentSlide++;
-        } else {
-            currentSlide = 0;
-        }
+        currentSlide = currentSlide < boxes.length - 1 ? currentSlide + 1 : 0;
         updateSlidePosition();
     }, 3000);
 }
@@ -198,7 +157,28 @@ function stopAutoSlide() {
     clearInterval(autoSlideInterval);
 }
 
-// Window resize handler
+function toggleView() {
+    const slider = document.querySelector('.project-slider');
+    const btn = document.querySelector('.view-toggle-btn');
+    const dots = document.querySelector('.slide-dots');
+    
+    isExpanded = !isExpanded;
+    slider.classList.toggle('expanded');
+    btn.querySelector('.toggle-text').textContent = isExpanded ? 'Collapse Projects' : 'View All Projects';
+    dots.style.display = isExpanded ? 'none' : 'flex';
+    
+    if (isExpanded) {
+        stopAutoSlide();
+        document.querySelectorAll('.project-box').forEach(box => {
+            box.style.transform = '';
+        });
+    } else {
+        currentSlide = 0;
+        updateSlidePosition();
+        startAutoSlide();
+    }
+}
+
 window.addEventListener('resize', () => {
     if (window.innerWidth <= 768 && !isExpanded) {
         startAutoSlide();
@@ -208,59 +188,21 @@ window.addEventListener('resize', () => {
     updateSlidePosition();
 });
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', initializeProjects);
+
+// ============================================
+// MOBILE MENU TOGGLE
+// ============================================
+
+menuIcon.onclick = () => {
+    menuIcon.classList.toggle('bx-x');
+    navbar.classList.toggle('active');
+};
 
 
 
-function toggleContent(contentId) {
-    const content = document.getElementById(`content-${contentId}`);
-    const allContent = document.querySelectorAll('.timeline-content');
-    const verticalLine = document.getElementById(`vl-${contentId}`);
-    const horizontalLine = document.getElementById(`hl-${contentId}`);
-
-    // Hide all content except the selected one
-    allContent.forEach((item) => {
-        if (item !== content) {
-            item.classList.remove('active');
-            const lineId = item.id.split('-')[1];
-            const otherVerticalLine = document.getElementById(`vl-${lineId}`);
-            const otherHorizontalLine = document.getElementById(`hl-${lineId}`);
-            
-            if (window.matchMedia("(max-width: 700px)").matches) {
-                otherVerticalLine.style.height = "13rem"; // Adjust for mobile view
-                otherHorizontalLine.style.top = "160%";
-            } else {
-                otherVerticalLine.style.height = "14.5rem"; // Default height for larger screens
-                otherHorizontalLine.style.top = "150%";
-            }
-        }
-    });
-
-    // Toggle the visibility of the selected content
-    content.classList.toggle('active');
-
-    // Adjust vertical and horizontal lines based on content visibility
-    if (content.classList.contains('active')) {
-        const contentHeight = content.scrollHeight;
-        if (window.matchMedia("(max-width: 700px)").matches) {
-            verticalLine.style.height = `${contentHeight + 114}px`; // Adjusted for mobile view
-            horizontalLine.style.top = `${contentHeight + 82}px`;
-        } else {
-            verticalLine.style.height = `${contentHeight + 140}px`; // Default for larger screens
-            horizontalLine.style.top = `${contentHeight + 103}px`;
-        }
-    } else {
-        if (window.matchMedia("(max-width: 700px)").matches) {
-            verticalLine.style.height = "13rem"; // Reset height for mobile
-            horizontalLine.style.top = "160%";
-        } else {
-            verticalLine.style.height = "14.5rem"; // Default height for larger screens
-            horizontalLine.style.top = "150%";
-        }
-    }
-}
-
+// ============================================
+// NAVIGATION & SCROLL HANDLING
+// ============================================
 
 window.onscroll = () => {
     let top = window.scrollY;
@@ -276,292 +218,470 @@ window.onscroll = () => {
     });
 };
 
-menuIcon.onclick = () => {
-    menuIcon.classList.toggle('bx-x');
-    navbar.classList.toggle('active');
-};
+
+// ============================================
+// TIMELINE/EDUCATION SECTION
+// ============================================
+
+function toggleContent(contentId) {
+    const content = document.getElementById(`content-${contentId}`);
+    const allContent = document.querySelectorAll('.timeline-content');
+    const verticalLine = document.getElementById(`vl-${contentId}`);
+    const horizontalLine = document.getElementById(`hl-${contentId}`);
+    const isMobile = window.matchMedia("(max-width: 700px)").matches;
+
+    // Hide all other content
+    allContent.forEach((item) => {
+        if (item !== content) {
+            item.classList.remove('active');
+            const lineId = item.id.split('-')[1];
+            const otherVerticalLine = document.getElementById(`vl-${lineId}`);
+            const otherHorizontalLine = document.getElementById(`hl-${lineId}`);
+            
+            otherVerticalLine.style.height = isMobile ? "13rem" : "14.5rem";
+            otherHorizontalLine.style.top = isMobile ? "160%" : "150%";
+        }
+    });
+
+    // Toggle selected content
+    content.classList.toggle('active');
+
+    // Adjust lines based on content state
+    if (content.classList.contains('active')) {
+        const contentHeight = content.scrollHeight;
+        verticalLine.style.height = `${contentHeight + (isMobile ? 114 : 140)}px`;
+        horizontalLine.style.top = `${contentHeight + (isMobile ? 82 : 103)}px`;
+    } else {
+        verticalLine.style.height = isMobile ? "13rem" : "14.5rem";
+        horizontalLine.style.top = isMobile ? "160%" : "150%";
+    }
+}
 
 
-
+// ============================================
+// CIRCULAR ICON ANIMATION & PHYSICS
+// ============================================
 
 document.addEventListener('DOMContentLoaded', function () {
-    const icons = document.querySelectorAll('.logo');
-    const circle = document.querySelector('.circle');
+    const iconEls = Array.from(document.querySelectorAll('.logo'));
+    const circle  = document.querySelector('.circle');
 
-    const updateCircleDimensions = () => {
-        const circleRect = circle.getBoundingClientRect();
+    // ── Physics constants ──────────────────────────────────────────
+    const GRAVITY       = 0.07;   // moon-like low gravity (floaty, slow pull down)
+    const WALL_BOUNCE   = 0.78;   // rubber ball — high energy kept on wall hit
+    const ICON_BOUNCE   = 0.72;   // rubber ball — elastic icon-to-icon collision
+    const FRICTION      = 0.995;  // very low air resistance, momentum preserved long
+    const SPACE_DAMPING = 0.985;  // near-zero drag outside circle (space float)
+    const PULL_BACK     = 0.025;  // gentle pull back toward circle centre when outside
+
+    // ── Helpers ────────────────────────────────────────────────────
+    function getCircleDims() {
         return {
-            radius: circleRect.width / 2,
-            centerX: circleRect.width / 2,
-            centerY: circleRect.height / 2
+            R:  circle.offsetWidth  / 2,
+            cx: circle.offsetWidth  / 2,
+            cy: circle.offsetHeight / 2
         };
-    };
+    }
 
-    let { radius, centerX, centerY } = updateCircleDimensions();
+    let { R, cx, cy } = getCircleDims();
 
-    window.addEventListener('resize', debounce(() => {
-        ({ radius, centerX, centerY } = updateCircleDimensions());
-        arrangeIconsInDynamicPattern();
-    }, 200));
+    // Per-icon collision radius based on actual rendered element size
+    function iconR(el) {
+        return Math.max(el.offsetWidth, el.offsetHeight) / 2;
+    }
 
-    circle.addEventListener('click', () => {
-        arrangeIconsInRing();
-        circle.classList.add('rotate-icons');
-    });
+    // ── Build physics bodies ───────────────────────────────────────
+    // b.x / b.y = centre of icon element, relative to .circle top-left
+    const bodies = iconEls.map(el => ({
+        el,
+        r:  iconR(el),
+        x: cx, y: cy,
+        vx: 0, vy: 0,
+        dragging: false,
+        active: false       // false = CSS owns this icon; true = physics owns it
+    }));
 
-    icons.forEach((icon, index) => {
+    function applyDOM(b) {
+        b.el.style.left = `${b.x - b.r}px`;
+        b.el.style.top  = `${b.y - b.r}px`;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PHASE 1 — Landing
+    // Icons fly from random positions outside the circle, all converge
+    // to the exact centre of the circle, overlapping each other.
+    // ═══════════════════════════════════════════════════════════════
+    iconEls.forEach((el, i) => {
+        const sr    = iconR(el);
         const angle = Math.random() * 2 * Math.PI;
-        const initialPosition = {
-            x: centerX + radius * 1.5 * Math.cos(angle) - icon.offsetWidth / 2,
-            y: centerY + radius * 1.5 * Math.sin(angle) - icon.offsetHeight / 2
-        };
-    
-        // Initial setup of icon positions and styles
-        Object.assign(icon.style, {
-            left: `${initialPosition.x}px`,
-            top: `${initialPosition.y}px`,
-            opacity: 0,
-            // transform: 'scale(0.5)', // Start at scale 0.5
+        const sx    = cx + R * 2 * Math.cos(angle) - sr;
+        const sy    = cy + R * 2 * Math.sin(angle) - sr;
+
+        Object.assign(el.style, {
+            position:   'absolute',
+            left:       `${sx}px`,
+            top:        `${sy}px`,
+            opacity:    '0',
+            transform:  'scale(0.95)',
             transition: 'all 2.5s ease'
         });
-    
-        // Start animating after a delay based on the index
+
         setTimeout(() => {
-            icon.style.opacity = 1;
-            const settledPosition = {
-                x: centerX - icon.offsetWidth / 2,
-                y: centerY - icon.offsetHeight / 2
-            };
-            Object.assign(icon.style, {
-                left: `${settledPosition.x}px`,
-                top: `${settledPosition.y}px`,
-                transform: 'scale(0.95)' // Ensure icons are still scaled to 0.5
-            });
-    
-            // After the icons have moved to the center, scale them to 0.95
+            el.style.opacity = '1';
+            // exact centre of the circle element
+            el.style.left = `${cx - sr}px`;
+            el.style.top  = `${cy - sr}px`;
+
+            // shrink to 0.5 and hold — blast fires right after this settles
             setTimeout(() => {
-                icon.style.transform = 'scale(0.5)';
-                setTimeout(() => {icon.style.transform = 'scale(0.95)';},5000);
-    
-                // Call arrangeIconsInDynamicPattern after all icons have reached scale 0.95
-                setTimeout(() => arrangeIconsInDynamicPattern(), 6000);
-            }, 2500); // Adjust this delay to match when the icons settle before scaling to 0.95
-        }, index * 120);
+                el.style.transition = 'transform 0.5s ease';
+                el.style.transform  = 'scale(0.65)';
+            }, 2500);
+        }, i * 120);
     });
-    
-    
-    function arrangeIconsInDynamicPattern() {
-        const iconData = Array.from(icons).map(icon => {
-            return {
-                element: icon,
-                x: centerX, // Start from the center of the circle
-                y: centerY, // Start from the center of the circle
-                velocityX: 0, // Initial horizontal velocity
-                velocityY: 0, // Initial vertical velocity
-                width: icon.offsetWidth,
-                height: icon.offsetHeight,
-            };
-        });
-    
-        let isRunning = true; // Track if the animation is running
-        const gravityStrength = 0.6; // Gravity strength
-        const damping = 0.78; // Damping factor to simulate air resistance
-        const iconRadius = radius * 0.95; // Boundary radius for the icons
-        let spreadingComplete = true; // Track if spreading is complete
-        
-        // Calculate the angle increment based on the number of icons
-        const angleIncrement = (2 * Math.PI) / icons.length;
-        // Initial positioning: Spread icons horizontally and start above the circle center
-        iconData.forEach((icon, index) => {
-            const angle = index * angleIncrement;
-            
-            // Calculate offsets based on the angle and screen size
-                const offsetX = Math.cos(angle) * (window.innerWidth * 1); 
-                const offsetY = Math.sin(angle) * (window.innerHeight * 0.8);
-               
 
-                // Set icon's initial position
-                icon.x = centerX + offsetX;
-                icon.y = centerY + offsetY;
+    // ═══════════════════════════════════════════════════════════════
+    // PHASE 2 — Blast
+    // After the scale pulse completes, icons explode outward far
+    // beyond the circle boundary (original arrangeIconsInDynamicPattern
+    // spread behaviour).
+    // ═══════════════════════════════════════════════════════════════
+    const blastDelay = (iconEls.length - 1) * 120 + 2500 + 1000;
 
-               
-            // Apply CSS transition for the initial spreading
-            Object.assign(icon.element.style, {
-                left: `${icon.x}px`,
-                top: `${icon.y}px`,
-                transition: 'left 1s ease, top 1s ease', // Add transition for spreading
+    setTimeout(() => {
+        const angleStep = (2 * Math.PI) / iconEls.length;
+
+        iconEls.forEach((el, i) => {
+            const angle  = i * angleStep;
+            const sr     = iconR(el);
+            el.style.transform  = 'scale(0.95)';
+            // blast far outside — mirrors old arrangeIconsInDynamicPattern offsets
+            const blastX = cx + Math.cos(angle) * (window.innerWidth  * 0.9);
+            const blastY = cy + Math.sin(angle) * (window.innerHeight * 0.8);
+
+            Object.assign(el.style, {
+                transition: 'left 1s ease, top 1s ease',
+                left:       `${blastX - sr}px`,
+                top:        `${blastY - sr}px`,
             });
-    
-            // Mark the icon as needing a transition end event
-            icon.element.addEventListener('transitionend', () => {
-                if (index === iconData.length - 1) {
-                    spreadingComplete = true; // Set to true when all icons have finished spreading
-                    startGravity(); // Start gravity after spreading is complete
-                }
-            }, { once: true }); // Ensure the event listener is called only once
-        });
-    
-        function startGravity() {
-            // Start the physics simulation after spreading is complete
-            function updatePhysics() {
-                if (!isRunning) return; // Stop if animation is no longer running
-    
-                iconData.forEach((icon, index) => {
-                    // Apply gravity to pull the icons down
-                    icon.velocityY += gravityStrength;
-    
-                    // Apply damping to simulate air resistance
-                    icon.velocityY *= damping;
-    
-                    // Update positions
-                    icon.y += icon.velocityY;
-    
-                    // Constrain icons within the circle boundary smoothly
-                    const iconCenterX = icon.x + icon.width / 2;
-                    const iconCenterY = icon.y + icon.height / 2;
-                    const distanceFromCenter = Math.sqrt((iconCenterX - centerX) ** 2 + (iconCenterY - centerY) ** 2);
-    
-                    if (distanceFromCenter + icon.width / 2 > iconRadius) {
-                        // Keep the icon within the boundary without bouncing
-                        const angle = Math.atan2(iconCenterY - centerY, iconCenterX - centerX);
-                        icon.x = centerX + (iconRadius - icon.width / 2) * Math.cos(angle) - icon.width / 2;
-                        icon.y = centerY + (iconRadius - icon.height / 2) * Math.sin(angle) - icon.height / 2;
-    
-                        // Simply stop applying velocity without bouncing
-                        icon.velocityY = 0; // Reset velocity
-                    }
-    
-                    // Ensure no overlapping with separation logic
-                    iconData.forEach((otherIcon, otherIndex) => {
-                        if (icon !== otherIcon) {
-                            const dx = icon.x - otherIcon.x;
-                            const dy = icon.y - otherIcon.y;
-                            const distance = Math.sqrt(dx * dx + dy * dy);
-                            const minDistance = (icon.width + otherIcon.width) / 2 + 5; // Add spacing
-    
-                            if (distance < minDistance) {
-                                // Calculate overlap
-                                const overlap = minDistance - distance;
-    
-                                // Normalize direction
-                                const angle = Math.atan2(dy, dx);
-                                const pushX = Math.cos(angle) * overlap / 2;
-                                const pushY = Math.sin(angle) * overlap / 2;
-    
-                                // Push icons apart
-                                icon.x += pushX;
-                                icon.y += pushY;
-                                otherIcon.x -= pushX;
-                                otherIcon.y -= pushY;
-    
-                                // Adjust velocities for a more natural separation
-                                icon.velocityY += pushY * 0.04; // Less aggressive velocity adjustment
-                                otherIcon.velocityY -= pushY * 0.04; // Less aggressive velocity adjustment
-                            }
-                        }
-                    });
-    
-                    // Apply the calculated styles
-                    Object.assign(icon.element.style, {
-                        left: `${icon.x}px`,
-                        top: `${icon.y}px`,
-                        transition: 'left 0.5s, top 0.5s', // Smooth transition for physics updates
-                    });
-                });
-    
-                requestAnimationFrame(updatePhysics);
-            }
-    
-            updatePhysics(); // Start the physics simulation
-        }
-    
-        // Stop the gravity animation and arrange icons in a ring when the circle is clicked
-        circle.addEventListener('click', () => {
-            isRunning = false;
-            arrangeIconsInRing(); // Call the arrangeIconsInRing function
-            circle.classList.add('rotate-icons');
-        });
-    }
-    
-   
-    function arrangeIconsInRing() {
-        const angleStep = (2 * Math.PI) / icons.length;
-        icons.forEach((icon, index) => {
-            const angle = index * angleStep;
-            const iconPosition = {
-                x: centerX + (radius * 1.2) * Math.cos(angle) - icon.offsetWidth / 2,
-                y: centerY + (radius * 1.2) * Math.sin(angle) - icon.offsetHeight / 2 
-            };
 
-            Object.assign(icon.style, {
-                position: 'absolute',
+            // Mark body position as blasted so physics can pick up from there
+            bodies[i].x = blastX;
+            bodies[i].y = blastY;
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // PHASE 3 — CSS return journey, then per-icon physics handoff
+        // After blast lands, each icon CSS-transitions back to a spread
+        // position inside the circle. The moment each icon's transition
+        // ends, transition is stripped and physics activates for that
+        // icon individually — so coming-in animation plays in full.
+        // ═══════════════════════════════════════════════════════════
+        iconEls[iconEls.length - 1].addEventListener('transitionend', () => {
+            const returnAngleStep = (2 * Math.PI) / iconEls.length;
+
+            // Build a shuffled index list so icons return in random order
+            const order = iconEls.map((_, i) => i)
+                .sort(() => Math.random() - 0.5);
+
+            // Assign each slot a random delay in 0–2 s window so 1-2 arrive
+            // at roughly the same time rather than strict one-by-one sequence
+            order.forEach(i => {
+                const el  = iconEls[i];
+                const b   = bodies[i];
+                const sr  = iconR(el);
+                const angle = i * returnAngleStep;
+                const retX  = cx + Math.cos(angle) * (R * 0.62);
+                const retY  = cy + Math.sin(angle) * (R * 0.62);
+
+                b.x = retX;
+                b.y = retY;
+
+                const delay = Math.random() * 2000;   // 0–2 s random stagger
+
+                setTimeout(() => {
+                    Object.assign(el.style, {
+                        transition: 'left 1.4s ease, top 1.4s ease',
+                        left:       `${retX - sr}px`,
+                        top:        `${retY - sr}px`,
+                    });
+
+                    el.addEventListener('transitionend', () => {
+                        el.style.transition = 'none';
+                        b.x  = parseFloat(el.style.left) + b.r;
+                        b.y  = parseFloat(el.style.top)  + b.r;
+                        const a = Math.random() * 2 * Math.PI;
+                        b.vx = Math.cos(a) * 1.5;
+                        b.vy = Math.sin(a) * 1.5;
+                        b.active = true;
+                    }, { once: true });
+                }, delay);
+            });
+
+            // Start the physics loop now — it skips inactive icons
+            startPhysics();
+        }, { once: true });
+
+    }, blastDelay);
+
+    // ── Physics / ring state ──────────────────────────────────────
+    let physicsRunning = false;
+    let ringMode       = false;
+    let ringRAF        = null;
+
+    function startPhysics() {
+        if (physicsRunning) return;
+        physicsRunning = true;
+        requestAnimationFrame(physicsLoop);
+    }
+
+    // ── Ring mode ─────────────────────────────────────────────────
+    // Double-click the circle to enter / exit ring mode.
+    // Icons CSS-transition to an evenly-spaced orbit ring, then
+    // rotate continuously. Double-click again → physics resumes.
+    function enterRingMode() {
+        physicsRunning = false;
+        ringMode       = true;
+        if (ringRAF) { cancelAnimationFrame(ringRAF); ringRAF = null; }
+
+        // Apply the class NOW so icons immediately get their 70×70 ring sizes,
+        // but freeze the rotation so we can position icons cleanly first.
+        circle.classList.add('rotate-icons');
+        circle.style.animation = 'none';
+        void circle.offsetWidth;   // force reflow — icons are now 70×70
+
+        const angleStep = (2 * Math.PI) / iconEls.length;
+
+        iconEls.forEach((el, i) => {
+            // Use the real post-class dimensions for exact centring
+            const hw    = el.offsetWidth  / 2;   // 35px
+            const hh    = el.offsetHeight / 2;   // 35px
+            // Place icon centres just outside the circle boundary
+            const ringR = R + hw + 4;
+            const angle = i * angleStep;
+            const deg   = angle * (180 / Math.PI) + 90;  // face outward
+
+            Object.assign(el.style, {
                 transition: 'left 1.2s ease, top 1.2s ease, transform 1.2s ease',
-                left: `${iconPosition.x}px`,
-                top: `${iconPosition.y}px`,
-                transform: `rotate(${angle * (180 / Math.PI) + 90}deg) scale(0.95)`
+                left:       `${cx + Math.cos(angle) * ringR - hw}px`,
+                top:        `${cy + Math.sin(angle) * ringR - hh}px`,
+                transform:  `rotate(${deg}deg) scale(0.95)`,
             });
+
+            bodies[i].active = false;
+            bodies[i].vx     = 0;
+            bodies[i].vy     = 0;
         });
 
-        setTimeout(() => icons.forEach(icon => icon.style.opacity = 1), 400);
+        // After icons settle into position, release the CSS rotation
+        setTimeout(() => {
+            if (!ringMode) return;
+            iconEls.forEach(el => { el.style.transition = 'none'; });
+            circle.style.animation = '';   // rotateRing 20s takes over
+        }, 1300);
     }
 
-    
-// Draggable icons optimized
+    function exitRingMode() {
+        ringMode = false;
+        if (ringRAF) { cancelAnimationFrame(ringRAF); ringRAF = null; }
 
-icons.forEach(icon => {
-    const startDrag = event => {
-        event.preventDefault();
-        const isTouch = event.type === 'touchstart';
-        const startX = isTouch ? event.touches[0].clientX : event.clientX;
-        const startY = isTouch ? event.touches[0].clientY : event.clientY;
-        
-        // Capture the initial icon offset from the top-left corner of the page
-        const iconRect = icon.getBoundingClientRect();
-        const offsetX = startX - iconRect.left;
-        const offsetY = startY - iconRect.top;
+        // Remove CSS ring animation — clear any inline animation override and reset transform
+        circle.classList.remove('rotate-icons');
+        circle.style.animation  = '';
+        circle.style.transform  = '';
 
-        let x, y;
-        let isDragging = false;
+        // Hand every icon back to physics: strip transform, give outward flick
+        iconEls.forEach((el, i) => {
+            const b = bodies[i];
+            el.style.transition = 'none';
+            el.style.transform  = 'scale(0.95)';
+            b.x  = parseFloat(el.style.left) + b.r;
+            b.y  = parseFloat(el.style.top)  + b.r;
+            const a  = Math.atan2(b.y - cy, b.x - cx);
+            b.vx     = Math.cos(a) * 2.5;
+            b.vy     = Math.sin(a) * 2.5;
+            b.active = true;
+        });
 
-        // RequestAnimationFrame loop for smooth dragging
-        const onDrag = moveEvent => {
-            isDragging = true;
-            const clientX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
-            const clientY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+        startPhysics();
+    }
 
-            // Calculate the new x and y position so that the icon's center is at the mouse/touch position
-            x = clientX - offsetX;
-            y = clientY - offsetY;
+    // Desktop double-click + mobile double-tap both toggle ring mode
+    const toggleRing = () => { if (ringMode) exitRingMode(); else enterRingMode(); };
 
-            requestAnimationFrame(() => {
-                if (isDragging) {
-                    // Directly set the position of the icon to follow the mouse/touch position
-                    icon.style.left = `${x}px`;
-                    icon.style.top = `${y}px`;
+    circle.addEventListener('dblclick', toggleRing);
+
+    // Double-tap detection for touch (two taps within 300 ms)
+    let lastTap = 0;
+    circle.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTap < 300) {
+            e.preventDefault();   // prevent the browser's synthetic dblclick / zoom
+            toggleRing();
+        }
+        lastTap = now;
+    });
+
+    // ── Main physics loop ──────────────────────────────────────────
+    function physicsLoop() {
+        if (!physicsRunning) return;     // stopped by ring mode or reset
+        // ── Per-body: gravity / space + wall collision ─────────────
+        bodies.forEach(b => {
+            if (!b.active) return;          // still on CSS return journey
+            if (b.dragging) { applyDOM(b); return; }
+            const dx   = b.x - cx;
+            const dy   = b.y - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist + b.r < R) {
+                // Inside circle — gravity pulls down
+                b.vy += GRAVITY;
+                b.vx *= FRICTION;
+                b.vy *= FRICTION;
+            } else {
+                // Outside circle — space: slow drift + gentle inward pull
+                b.vx *= SPACE_DAMPING;
+                b.vy *= SPACE_DAMPING;
+                if (dist > 0) {
+                    b.vx -= (dx / dist) * PULL_BACK;
+                    b.vy -= (dy / dist) * PULL_BACK;
                 }
-            });
-        };
+            }
 
-        const endDrag = () => {
-            isDragging = false;
-            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
-            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
-        };
+            b.x += b.vx;
+            b.y += b.vy;
 
-        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag, { passive: false });
-        document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
-    };
+            // Circle wall: rubber bounce
+            const nx = b.x - cx;
+            const ny = b.y - cy;
+            const nd = Math.sqrt(nx * nx + ny * ny);
+            if (nd + b.r > R) {
+                const ratio = (R - b.r) / nd;
+                b.x = cx + nx * ratio;
+                b.y = cy + ny * ratio;
+                const nnx = nx / nd;
+                const nny = ny / nd;
+                const dot = b.vx * nnx + b.vy * nny;
+                b.vx = (b.vx - 2 * dot * nnx) * WALL_BOUNCE;
+                b.vy = (b.vy - 2 * dot * nny) * WALL_BOUNCE;
+            }
 
-    icon.addEventListener('mousedown', startDrag);
-    icon.addEventListener('touchstart', startDrag, { passive: false });
-});
+            applyDOM(b);
+        });
 
+        // ── Icon-to-icon elastic rubber collisions ─────────────────
+        // Icons have real 2D volume — they push each other apart and
+        // bounce so they naturally fill the circle without overlapping.
+        for (let i = 0; i < bodies.length; i++) {
+            for (let j = i + 1; j < bodies.length; j++) {
+                const a    = bodies[i];
+                const b    = bodies[j];
+                const dx   = b.x - a.x;
+                const dy   = b.y - a.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const minD = a.r + b.r;
 
-    function debounce(func, wait) {
-        let timeout;
-        return function (...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
+                if (dist < minD && dist > 0) {
+                    // Separate overlapping bodies proportionally
+                    const overlap = (minD - dist) / 2;
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+
+                    if (!a.dragging) { a.x -= nx * overlap; a.y -= ny * overlap; }
+                    if (!b.dragging) { b.x += nx * overlap; b.y += ny * overlap; }
+
+                    // Exchange velocity along collision normal (elastic rubber)
+                    const relVx = a.vx - b.vx;
+                    const relVy = a.vy - b.vy;
+                    const dot   = relVx * nx + relVy * ny;
+                    if (dot > 0) {
+                        const imp = dot * ICON_BOUNCE;
+                        if (!a.dragging) { a.vx -= imp * nx; a.vy -= imp * ny; }
+                        if (!b.dragging) { b.vx += imp * nx; b.vy += imp * ny; }
+                    }
+                }
+            }
+        }
+
+        if (physicsRunning) requestAnimationFrame(physicsLoop);
     }
+
+    // ── Real-time zero-delay dragging ──────────────────────────────
+    bodies.forEach(body => {
+        const onDragStart = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            body.dragging        = true;
+            body.vx              = 0;
+            body.vy              = 0;
+            body.el.style.zIndex = '999';
+
+            const isTouch    = e.type === 'touchstart';
+            const clientX    = isTouch ? e.touches[0].clientX : e.clientX;
+            const clientY    = isTouch ? e.touches[0].clientY : e.clientY;
+            const circleRect = circle.getBoundingClientRect();
+
+            const grabX = clientX - (circleRect.left + body.x);
+            const grabY = clientY - (circleRect.top  + body.y);
+            let prevX = body.x, prevY = body.y;
+
+            const onMove = (e) => {
+                if (e.cancelable) e.preventDefault();
+                const mx   = e.touches ? e.touches[0].clientX : e.clientX;
+                const my   = e.touches ? e.touches[0].clientY : e.clientY;
+                const rect = circle.getBoundingClientRect();
+                prevX  = body.x;
+                prevY  = body.y;
+                body.x = mx - grabX - rect.left;
+                body.y = my - grabY - rect.top;
+                body.el.style.left = `${body.x - body.r}px`;
+                body.el.style.top  = `${body.y - body.r}px`;
+            };
+
+            const onEnd = () => {
+                body.dragging        = false;
+                body.el.style.zIndex = '';
+                body.vx = (body.x - prevX) * 1.2;
+                body.vy = (body.y - prevY) * 1.2;
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('mouseup',   onEnd);
+                document.removeEventListener('touchend',  onEnd);
+            };
+
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('mouseup',   onEnd);
+            document.addEventListener('touchend',  onEnd);
+        };
+
+        body.el.addEventListener('mousedown',  onDragStart);
+        body.el.addEventListener('touchstart', onDragStart, { passive: false });
+    });
+
+    // ── Resize ─────────────────────────────────────────────────────
+    window.addEventListener('resize', debounce(() => {
+        ({ R, cx, cy } = getCircleDims());
+    }, 200));
 });
+
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+document.addEventListener('DOMContentLoaded', initializeProjects);
