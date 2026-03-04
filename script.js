@@ -9,10 +9,12 @@ let navLinks = document.querySelectorAll('header nav a');
 // Project Slider Variables
 let currentSlide = 0;
 let autoSlideInterval;
+let autoSlideResumeTimer;
 let isExpanded = false;
 let isDragging = false;
 let startY = 0;
 let scrollTop = 0;
+let isWheelScrolling = false;
 
 
 // ============================================
@@ -54,9 +56,13 @@ function setupEventListeners() {
     slider.addEventListener('wheel', (e) => {
         if (!isExpanded) {
             e.preventDefault();
-            moveSlide(e.deltaY > 0 ? 'down' : 'up');
+            if (isWheelScrolling) return;
+            isWheelScrolling = true;
+            moveSlide(e.deltaY > 0 ? 'down' : 'up', true);
+            scheduleAutoSlideResume();
+            setTimeout(() => { isWheelScrolling = false; }, 600);
         }
-    });
+    }, { passive: false });
 }
 
 function startDragging(e) {
@@ -66,6 +72,7 @@ function startDragging(e) {
     startY = e.type === 'mousedown' ? e.pageY : e.touches[0].pageY;
     scrollTop = currentSlide * document.querySelector('.project-box').offsetHeight;
     stopAutoSlide();
+    clearTimeout(autoSlideResumeTimer);
 }
 
 function drag(e) {
@@ -77,6 +84,7 @@ function drag(e) {
     const boxes = document.querySelectorAll('.project-box');
     
     boxes.forEach(box => {
+        box.style.transition = 'none';
         box.style.transform = `translateY(${-scrollTop - walk}px)`;
     });
 }
@@ -89,15 +97,15 @@ function stopDragging(e) {
     const walk = startY - y;
     
     if (Math.abs(walk) > 50) {
-        moveSlide(walk > 0 ? 'down' : 'up');
+        moveSlide(walk > 0 ? 'down' : 'up', true);
     } else {
         updateSlidePosition();
     }
     
-    startAutoSlide();
+    scheduleAutoSlideResume();
 }
 
-function moveSlide(direction) {
+function moveSlide(direction, fromUser = false) {
     if (isExpanded) return;
     
     const boxes = document.querySelectorAll('.project-box');
@@ -110,16 +118,27 @@ function moveSlide(direction) {
     }
     
     updateSlidePosition();
-    startAutoSlide();
+    
+    if (!fromUser) {
+        startAutoSlide();
+    }
 }
 
 function goToSlide(index) {
     if (isExpanded) return;
     
     stopAutoSlide();
+    clearTimeout(autoSlideResumeTimer);
     currentSlide = index;
     updateSlidePosition();
-    startAutoSlide();
+    scheduleAutoSlideResume();
+}
+
+function scheduleAutoSlideResume() {
+    clearTimeout(autoSlideResumeTimer);
+    autoSlideResumeTimer = setTimeout(() => {
+        startAutoSlide();
+    }, 3000);
 }
 
 function updateSlidePosition() {
@@ -129,6 +148,7 @@ function updateSlidePosition() {
     const slideHeight = boxes[0].offsetHeight;
     
     boxes.forEach(box => {
+        box.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
         box.style.transform = `translateY(${-currentSlide * slideHeight}px)`;
     });
     
@@ -187,6 +207,63 @@ window.addEventListener('resize', () => {
     }
     updateSlidePosition();
 });
+
+
+// ============================================
+// ACHIEVEMENT CAROUSEL
+// ============================================
+
+function initAchievCarousel() {
+    const wrapper = document.getElementById('achiev-wrapper');
+    const dotsContainer = document.getElementById('achiev-dots');
+    if (!wrapper || !dotsContainer) return;
+
+    const items = wrapper.querySelectorAll('.achivement-item');
+
+    // Create dots dynamically
+    dotsContainer.innerHTML = '';
+    items.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.classList.add('achiev-dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => {
+            const gap = parseFloat(getComputedStyle(wrapper).gap) || 40;
+            const itemWidth = items[i].offsetWidth + gap;
+            wrapper.scrollTo({ left: i * itemWidth, behavior: 'smooth' });
+        });
+        dotsContainer.appendChild(dot);
+    });
+
+    const dots = dotsContainer.querySelectorAll('.achiev-dot');
+
+    // Sync active dot on scroll
+    wrapper.addEventListener('scroll', () => {
+        const gap = parseFloat(getComputedStyle(wrapper).gap) || 40;
+        const itemWidth = items[0].offsetWidth + gap;
+        const active = Math.round(wrapper.scrollLeft / itemWidth);
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === active));
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    wrapper.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    wrapper.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) {
+            const gap = parseFloat(getComputedStyle(wrapper).gap) || 40;
+            const itemWidth = items[0].offsetWidth + gap;
+            const current = Math.round(wrapper.scrollLeft / itemWidth);
+            const next = diff > 0
+                ? Math.min(current + 1, items.length - 1)
+                : Math.max(current - 1, 0);
+            wrapper.scrollTo({ left: next * itemWidth, behavior: 'smooth' });
+        }
+    }, { passive: true });
+}
+
+document.addEventListener('DOMContentLoaded', initAchievCarousel);
 
 
 // ============================================
