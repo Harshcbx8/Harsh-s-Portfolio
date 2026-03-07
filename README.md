@@ -1,14 +1,21 @@
-# 🌐 Personal Portfolio Website
+# Harsh Gupta — Developer Portfolio
 
-Welcome to my personal portfolio website! This project showcases my skills, projects, and experience as a developer. Built using **HTML**, **CSS**, and **JavaScript**, it's a fully responsive site designed to reflect my personal brand and highlight my work.
+A personal portfolio website built with vanilla HTML, CSS, and JavaScript — no frameworks, no build tools. Showcases projects, skills, achievements, and experience with a focus on clean design and mobile responsiveness.
+
+## Purpose
+
+Built to present my work as a Full-Stack Developer and AI/ML engineer — covering projects, technical skills, education timeline, achievements, and contact information in a single, fast-loading static site.
 
 ## 🚀 Features
 
-- Fully responsive design for all devices
-- Smooth scrolling navigation
-- Project showcase with live links
-- Contact form for inquiries
-- Clean, modern UI/UX
+- **Animated hero section** — rotating tech icon orbit, typewriter role animation
+- **Interactive education timeline** — expandable click-to-reveal timeline cards
+- **Project carousel** — auto-scrolling slider with dot navigation, wheel scroll, and mobile touch support; toggle between slider and full grid view
+- **Achievement carousel** — horizontal scroll with dot navigation and touch swipe
+- **About section** — Who I Am card with photo, Skills & Expertise grid (6 categories), Hobbies, and Future Goals
+- **Fully responsive** — optimized breakpoints from 1280px down to 360px
+- **Mobile navigation** — hamburger menu with smooth toggle
+- **No dependencies** — pure HTML/CSS/JS, only BoxIcons and Google Fonts loaded externally
 
 ## 🛠️ Tech Stack
 
@@ -25,4 +32,11 @@ Welcome to my personal portfolio website! This project showcases my skills, proj
 Check out the live version here: [https://harshcbx8.github.io/Harsh-s-Portfolio/](https://harshcbx8.github.io/Harsh-s-Portfolio/)
 
 ## 📁 Folder Structure
-portfolio/
+Harsh-s-Portfolio/
+├── index.html
+├── style.css
+├── script.js
+├── assets/
+    ├── images/ # Project and achievement images
+    ├── icons/ # Favicons and project icons
+    └── html/ # Sub-pages (hire, contact, success pages)
